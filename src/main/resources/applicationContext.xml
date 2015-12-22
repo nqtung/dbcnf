@@ -44,6 +44,7 @@
         <property name="propNames">
 			<list>
 				<value>JMS_URL</value>
+				<value>JMS_URL1</value>
 			</list>
 		</property>
         
