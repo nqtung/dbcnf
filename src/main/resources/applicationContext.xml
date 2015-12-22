@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/tx
+                            http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:component-scan base-package="com.tungfnq.config" />
+
+	<!-- Load default configuration -->
+	<bean id="sysProps" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="ignoreResourceNotFound" value="false" />
+		<property name="order" value="1" />
+        
+		<property name="locations">
+			<list>
+				<value>classpath:config.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Database Properties -->
+    <bean id="dbProps" class="com.tungfnq.config.DbPropertySourcesPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="order" value="2" />
+        <property name="placeholderPrefix" value="%{" />
+        <property name="placeholderSuffix" value="}" />
+        
+        <property name="dataSourceName" value="dataSource" />
+        
+        <!--  <property name="dbTableName" value="RITE_COMMON.SYS_PARAMS"/> -->
+        <property name="dbTableName" value="APP_CNF.APP_CNF_PARAM"/>
+        
+        <property name="dbKeyColumnName" value="NAME"/>
+        <property name="dbValueColumnName" value="VALUE"/>
+        
+      <!--   <property name="locations">
+            <list>
+                <value>classpath:static.properties</value>
+                <value>file:static.properties</value>
+            </list>
+        </property> -->
+
+    </bean>
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		
+		<!-- <property name="url" value="jdbc:postgresql://192.168.99.100:32768/app_conf" />
+		<property name="username" value="tungfnq" />
+		<property name="password" value="tungfnq99" /> -->
+		
+	</bean>
+
+	
+	<tx:annotation-driven transaction-manager="txManager" />
+
+	<!-- a PlatformTransactionManager is still required -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	
+    
+    <!--  -->
+    <bean id="sysParam" class="com.tungfnq.bean.SysParam">
+    	<property name="name" value="JMS_URL"/>
+    	<property name="value" value="%{JMS_URL}"/>
+    </bean>
+    
+    <bean id="sysParam1" class="com.tungfnq.bean.SysParam">
+    	<property name="name" value="jdbc.url"/>
+    	<property name="value" value="${jdbc.url}"/>
+    </bean>
+</beans>
