@@ -1,6 +1,7 @@
 package com.tungfnq.config;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -30,6 +31,7 @@ public class DbPropertySourcesPlaceholderConfigurer extends PropertySourcesPlace
 	private String dbKeyColumnName = DEFAULT_DBKEYCOLUMNNAME;
 	private String dbValueColumnName = DEFAULT_DBVALUECOLUMNNAME;
 	
+	private List<String> propNames = null;
 	
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
@@ -77,10 +79,24 @@ public class DbPropertySourcesPlaceholderConfigurer extends PropertySourcesPlace
 			
 			Configuration config = new DatabaseConfiguration(dataSource, tableName, keyColumnName, valueColumnName);
 			
-			for(Iterator<String>  iKey = config.getKeys(); iKey.hasNext(); ) {
-				String key = iKey.next();
-				String value = config.getString(key, "");
-				prop.put(key, value);
+			if(propNames != null && propNames.size() > 0) {
+				if(logger.isInfoEnabled()) {
+					logger.info("load values for propNames: " + propNames);
+				}
+				for(String key : propNames) {
+					String value = config.getString(key, "");
+					prop.put(key, value);
+				}
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("load all values from database");
+				}
+				
+				for(Iterator<String>  iKey = config.getKeys(); iKey.hasNext(); ) {
+					String key = iKey.next();
+					String value = config.getString(key, "");
+					prop.put(key, value);
+				}
 			}
 			
 			return prop;
@@ -89,38 +105,74 @@ public class DbPropertySourcesPlaceholderConfigurer extends PropertySourcesPlace
 			throw new BeanCreationException("loadPropFromDB()", e);
 		}
 	}
+	
+	/**
+	 * @return the propNames
+	 */
+	public List<String> getPropNames() {
+		return propNames;
+	}
 
+	/**
+	 * @param propNames the propNames to set
+	 */
+	public void setPropNames(List<String> propNames) {
+		this.propNames = propNames;
+	}
 
+	/**
+	 * @return the dataSourceName
+	 */
 	public String getDataSourceName() {
 		return dataSourceName;
 	}
 
+	/**
+	 * @param dataSourceName the dataSourceName to set
+	 */
 	public void setDataSourceName(String dataSourceName) {
 		this.dataSourceName = dataSourceName;
 	}
 
+	/**
+	 * @return the dbTableName
+	 */
 	public String getDbTableName() {
 		return dbTableName;
 	}
 
+	/**
+	 * @param dbTableName the dbTableName to set
+	 */
 	public void setDbTableName(String dbTableName) {
 		this.dbTableName = dbTableName;
 	}
 
+	/**
+	 * @return the dbKeyColumnName
+	 */
 	public String getDbKeyColumnName() {
 		return dbKeyColumnName;
 	}
 
+	/**
+	 * @param dbKeyColumnName the dbKeyColumnName to set
+	 */
 	public void setDbKeyColumnName(String dbKeyColumnName) {
 		this.dbKeyColumnName = dbKeyColumnName;
 	}
 
+	/**
+	 * @return the dbValueColumnName
+	 */
 	public String getDbValueColumnName() {
 		return dbValueColumnName;
 	}
 
+	/**
+	 * @param dbValueColumnName the dbValueColumnName to set
+	 */
 	public void setDbValueColumnName(String dbValueColumnName) {
 		this.dbValueColumnName = dbValueColumnName;
 	}
-
 }

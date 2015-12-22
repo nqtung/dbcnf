@@ -41,6 +41,12 @@
         <property name="dbKeyColumnName" value="NAME"/>
         <property name="dbValueColumnName" value="VALUE"/>
         
+        <property name="propNames">
+			<list>
+				<value>JMS_URL</value>
+			</list>
+		</property>
+        
       <!--   <property name="locations">
             <list>
                 <value>classpath:static.properties</value>
