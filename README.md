@@ -1,4 +1,4 @@
 # dbcnf
 Spring Properties in Database
 
-Database: Postgres
+Database: Spring4, Spring-JDBC, Apache Commons-Configuration, Postges
