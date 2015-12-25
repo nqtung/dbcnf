@@ -21,10 +21,10 @@
 	 <!-- environment variable called "APP_ENCRYPTION_PASSWORD" which, once    --> 
 	 <!-- the application has been started, could be safely unset.             -->
 	 <!--                                                                      -->
-	 <bean id="environmentVariablesConfiguration" class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+	 <bean id="environmentVariablesConfiguration" class="com.tungfnq.jasypt.DefaultEnvironmentStringPBEConfig">
 	   <property name="algorithm" value="PBEWithMD5AndDES" />
-	   <!-- <property name="passwordEnvName" value="APP_ENCRYPTION_PASSWORD" /> -->
-	  	<property name="password" value="hctra" />
+	   <property name="passwordEnvName" value="APP_ENCRYPTION_PASSWORD" />
+	  	<property name="defaultPassword" value="myPasswrod1" />
 	 </bean>
 	  
 	 <!--                                                                      -->
