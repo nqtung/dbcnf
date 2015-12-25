@@ -23,6 +23,9 @@ public class TestLoadDbConf {
 	        sysParam = (SysParam)applicationContext.getBean("sysParam1");
 	        System.out.println(sysParam);
 	        
+	        sysParam = (SysParam)applicationContext.getBean("sysParam2");
+	        System.out.println(sysParam);
+	        
 	    }catch( Exception ex ) {
 	            ex.printStackTrace();
 	    }

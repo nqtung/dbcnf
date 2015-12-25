@@ -12,21 +12,54 @@
 
 	<context:component-scan base-package="com.tungfnq.config" />
 
-	<!-- Load default configuration -->
-	<bean id="sysProps" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<!-- http://www.jasypt.org/spring31.html -->
+	<!-- https://wiki.jasig.org/display/CASUM/HOWTO+Use+Jasypt+to+encrypt+passwords+in+configuration+files -->
+	<!--                                                                      -->
+	 <!-- Configuration for encryptor, based on environment variables.         -->
+	 <!--                                                                      -->
+	 <!-- In this example, the encryption password will be read from an        -->
+	 <!-- environment variable called "APP_ENCRYPTION_PASSWORD" which, once    --> 
+	 <!-- the application has been started, could be safely unset.             -->
+	 <!--                                                                      -->
+	 <bean id="environmentVariablesConfiguration" class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+	   <property name="algorithm" value="PBEWithMD5AndDES" />
+	   <!-- <property name="passwordEnvName" value="APP_ENCRYPTION_PASSWORD" /> -->
+	  	<property name="password" value="hctra" />
+	 </bean>
+	  
+	 <!--                                                                      -->
+	 <!-- The will be the encryptor used for decrypting configuration values.  -->
+	 <!--                                                                      -->
+	 <bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+	   <property name="config" ref="environmentVariablesConfiguration" />
+	 </bean>
+	
+	
+	 <!--                                                                      -->
+	 <!-- The EncryptablePropertyPlaceholderConfigurer will read the           -->
+	 <!-- .properties files and make their values accessible as ${var}.        -->
+	 <!--                                                                      -->
+	 <!-- Our "configurationEncryptor" bean (which implements                  --> 
+	 <!-- org.jasypt.encryption.StringEncryptor) is set as a constructor arg.  -->
+	 <!--                                                                      -->
+	 <bean id="sysProps" class="com.tungfnq.jasypt.EncryptablePropertyPlaceholderConfigurer">
+		<constructor-arg ref="configurationEncryptor" />
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="ignoreResourceNotFound" value="false" />
 		<property name="order" value="1" />
-        
-		<property name="locations">
-			<list>
-				<value>classpath:config.properties</value>
-			</list>
-		</property>
-	</bean>
+	   <property name="locations">
+	     <list>
+	     	<value>classpath:config.properties</value>
+<!-- 	       <value>/WEB-INF/classes/application.properties</value> -->
+	     </list>
+	   </property>
+	 </bean>
+  
 	
 	<!-- Database Properties -->
-    <bean id="dbProps" class="com.tungfnq.config.DbPropertySourcesPlaceholderConfigurer">
+    <!-- <bean id="dbProps" class="com.tungfnq.config.DbPropertySourcesPlaceholderConfigurer"> -->
+	<bean id="dbProps" class="com.tungfnq.jasypt.DBEncryptablePropertySourcesPlaceholderConfigurer">
+       <constructor-arg ref="configurationEncryptor" />
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
         <property name="ignoreResourceNotFound" value="true"/>
         <property name="order" value="2" />
@@ -66,9 +99,7 @@
 		<!-- <property name="url" value="jdbc:postgresql://192.168.99.100:32768/app_conf" />
 		<property name="username" value="tungfnq" />
 		<property name="password" value="tungfnq99" /> -->
-		
 	</bean>
-
 	
 	<tx:annotation-driven transaction-manager="txManager" />
 
@@ -76,8 +107,6 @@
 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
-	
     
     <!--  -->
     <bean id="sysParam" class="com.tungfnq.bean.SysParam">
@@ -88,5 +117,9 @@
     <bean id="sysParam1" class="com.tungfnq.bean.SysParam">
     	<property name="name" value="jdbc.url"/>
     	<property name="value" value="${jdbc.url}"/>
+    </bean>
+    <bean id="sysParam2" class="com.tungfnq.bean.SysParam">
+    	<property name="name" value="${jdbc.username}"/>
+    	<property name="value" value="${jdbc.password}"/>
     </bean>
 </beans>
